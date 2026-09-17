@@ -1,4 +1,4 @@
-# Invoke-RoslynAudit
+# Rythorian's Invoke-RoslynAudit
 
 **Enterprise Roslyn SAST and code-quality analyzer for PowerShell.**
 Bootstraps the .NET Compiler Platform ("Roslyn") at runtime and audits C#, Visual
