@@ -26,7 +26,7 @@ directory, or a `.zip` archive, it:
    (`.xaml`, `.csproj`, `.props`, `.targets`, `.xml`, `.config`) — respecting a
    `.auditignore` exclusion file, or (with `-GitDiffOnly`) only files changed
    or added relative to git HEAD.
-3. **Parses every file in parallel** — real compiler syntax trees for C#/VB
+3. **Parses every file in Parallel** — real compiler syntax trees for C#/VB
    (Roslyn), the PowerShell AST parser for `.ps1/.psm1`, the host `g++`/`clang++`
    for C/C++, and the host Python interpreter for `.py`, via a runspace pool.
 4. **Applies heuristic security/quality rules** — 95 built-in regex rules
@@ -35,14 +35,14 @@ directory, or a `.zip` archive, it:
    sync-over-async, unsafe C functions, `eval`/`exec`, YAML/pickle
    deserialization, disabled TLS verification, and more), plus optional custom
    rule packs.
-5. **Reports** — findings with file, line, rule ID, severity, message, and
+5. **Reports** — My findings with file, line, rule ID, severity, message, and
    remediation guidance; to console, log file, and/or a JSON or SARIF 2.1.0
    report file. A severity gate (`-FailOn`) makes it CI-ready by exiting
    non-zero when thresholds are breached.
 
 ---
 
-## 2. Requirements
+## 2. Requirements:
 
 | Host | Minimum version | Notes |
 |------|----------------|-------|
