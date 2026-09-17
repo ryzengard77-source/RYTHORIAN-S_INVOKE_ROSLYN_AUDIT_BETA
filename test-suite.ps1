@@ -1,11 +1,11 @@
-# Full regression test suite for Invoke-RoslynAudit.ps1
+# Full regression test suite for Rythorian's Invoke-RoslynAudit.ps1
 param (
     [ValidateSet('pwsh', 'powershell')]
     [string]$TargetShell = 'pwsh'
 )
 
 $ErrorActionPreference = 'Continue'
-# Fixed AUD-03: Resolve-Path chokes on bracketed paths. $PSCommandPath is already fully qualified.
+# Resolve-Path chokes on bracketed paths... $PSCommandPath is already fully qualified.
 $scriptDir = Split-Path -Parent $PSCommandPath
 $target    = Join-Path $scriptDir 'Invoke-RoslynAudit.ps1'
 $root      = Join-Path $scriptDir 'audit-suite'
@@ -44,7 +44,7 @@ function Get-WorkspaceExtractPath {
     return Join-Path (Join-Path ([System.IO.Path]::GetTempPath()) "RoslynAuditWorkspace_$userKey") 'Extracted'
 }
 
-# --- fixtures ----------------------------------------------------------------
+# Test Path 
 if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 New-Item -ItemType Directory -Path $root | Out-Null
 
@@ -143,7 +143,7 @@ param ([string]$Target, [string]$File, [string[]]$Rest = @())
 & $Target $File @Rest -PassThru 6>$null | ConvertTo-Json -Depth 6
 '@ | Set-Content $passThruHelper -Encoding UTF8
 
-# --- cases ---------------------------------------------------------------------
+# cases 
 
 New-Case 'Parse: script parses with zero syntax errors' {
     $t = $null; $e = $null
@@ -448,7 +448,7 @@ New-Case 'Timeout: wall-clock budget returns partial results with TimedOut=true'
     return ($r.ExitCode -eq 0) -and ($j.Summary.TimedOut -eq $true)
 }
 
-# --- fixer cases -----------------------------------------------------------------
+# fixer cases 
 
 $fixerPath = Join-Path (Split-Path -Path $target -Parent) 'Invoke-RoslynFix.ps1'
 
