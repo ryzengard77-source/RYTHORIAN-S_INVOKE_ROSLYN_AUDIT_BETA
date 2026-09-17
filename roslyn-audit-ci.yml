@@ -1,0 +1,79 @@
+name: RoslynAudit CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    name: PSScriptAnalyzer gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run PSScriptAnalyzer on all scripts
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version 3.0
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          $files = @(
+            './Invoke-RoslynAudit.ps1',
+            './Invoke-RoslynFix.ps1',
+            './test-suite.ps1'
+          ) | Where-Object { Test-Path $_ }
+          $findings = @(Invoke-ScriptAnalyzer -Path $files)
+          if ($findings.Count -gt 0) {
+            $findings | Format-Table Line, Severity, RuleName, Message -AutoSize | Out-String -Width 200
+            throw "PSScriptAnalyzer reported $($findings.Count) finding(s)."
+          }
+          Write-Host 'PSScriptAnalyzer: zero findings.'
+
+  regression:
+    name: Regression suite (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test suite - PowerShell 7+
+        shell: pwsh
+        run: ./test-suite.ps1
+
+      - name: Test suite - Windows PowerShell 5.1
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./test-suite.ps1 -TargetShell powershell
+
+  code-scanning:
+    name: Upload SARIF to GitHub code scanning
+    runs-on: ubuntu-latest
+    needs: regression
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Invoke-RoslynAudit on the repo
+        shell: pwsh
+        run: |
+          ./Invoke-RoslynAudit.ps1 . -Sarif -ReportPath ./roslyn-audit.sarif -FailOn ERROR
+        continue-on-error: true
+
+      - name: Upload SARIF
+        if: hashFiles('roslyn-audit.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ./roslyn-audit.sarif
+
+      - name: Warn if no SARIF was produced
+        if: hashFiles('roslyn-audit.sarif') == ''
+        shell: pwsh
+        run: |
+          Write-Warning "roslyn-audit.sarif was not produced; the audit step likely failed before writing the report."
