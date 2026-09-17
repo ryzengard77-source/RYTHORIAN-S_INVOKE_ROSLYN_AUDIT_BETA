@@ -12,7 +12,7 @@ SARIF 2.1.0 reporting.
 
 ---
 
-## 1. What this application does
+## 1. What does this application do?
 
 `Invoke-RoslynAudit.ps1` is a single-file static-analysis tool. Given a file, a
 directory, or a `.zip` archive, it:
