@@ -32,7 +32,7 @@
 
 .NOTES
     Exit codes:
-      0 = success (fixes applied; manual-review items may remain)
+      0 = success (applied; manual-review items may remain)
       1 = fatal error (unreadable report, invalid paths, blocked output dir)
       2 = report contains no findings - nothing to fix
 #>
